@@ -1,5 +1,10 @@
 <template>
     <div class="task-table">
+        <div class="search-container">
+            <FontAwesomeIcon icon="search" class="search-icon" />
+            <input type="text" v-model="searchQuery" placeholder="Cerca per titolo o descrizione..."
+                class="search-input" />
+        </div>
         <table>
             <thead>
                 <tr>
@@ -11,11 +16,12 @@
                 </tr>
             </thead>
             <tbody>
-                <TaskItem v-for="task in tasks" :key="task.id" :task="task" @taskDeleted="handleTaskDeleted" />
+                <TaskItem v-for="task in filteredTasks" :key="task.id" :task="task" @taskDeleted="handleTaskDeleted" />
             </tbody>
         </table>
     </div>
 </template>
+
 
 
 <script setup lang="ts">
@@ -23,9 +29,24 @@
 import type { Task } from '@/model/task';
 import { onMounted, onUpdated, ref } from 'vue';
 import TaskItem from './TaskItem.vue';
+import { computed } from 'vue';
+
 
 let errorMsg = ref('');
 let tasks = ref<Task[]>([]);
+
+const searchQuery = ref('');
+
+const filteredTasks = computed(() =>
+    tasks.value.filter(task => {
+        const q = searchQuery.value.toLowerCase();
+        return (
+            task.title.toLowerCase().includes(q) ||
+            task.description.toLowerCase().includes(q)
+        );
+    })
+);
+
 
 const handleTaskDeleted = (id: number) => {
     tasks.value = tasks.value.filter(task => task.id !== id);
@@ -51,6 +72,43 @@ onMounted(loadTasks);
 </script>
 
 <style scoped>
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    /* padding a sinistra aumentato */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.dark .search-input {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
 .task-table {
     width: 100%;
     overflow-x: auto;
