@@ -1,2 +1,149 @@
 @import './base.css';
 
+/* Global Dark Mode Styles - da aggiungere al tuo CSS principale */
+
+/* Root variables per facilitare i cambi di tema */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.5);
+}
+
+/* Applica il tema al body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Stili per table */
+table {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.dark table {
+  background-color: var(--bg-secondary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Headers della tabella */
+th {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.dark th {
+  background-color: #334155;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Container principale dell'app */
+.app-container {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+.dark .app-container {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+/* Cards e containers */
+.card,
+.container {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px var(--shadow-light);
+  transition: all 0.3s ease;
+}
+
+.dark .card,
+.dark .container {
+  background-color: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Testi generici */
+p,
+span,
+div {
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+/* Titoli */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+/* Link */
+a {
+  color: #6366f1;
+  transition: color 0.3s ease;
+}
+
+.dark a {
+  color: #818cf8;
+}
+
+a:hover {
+  color: #4f46e5;
+}
+
+.dark a:hover {
+  color: #a5b4fc;
+}
+
+/* Scrollbar personalizzata per dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Smooth transitions per tutti gli elementi */
+* {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}

@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <div class="input-aggiunta">
+        <ModeToggle class="toggle" />
         <h3>Aggiungi Nuova Task</h3>
         <form @submit="addTask">
             <input v-model="title" name="title" placeholder="Titolo" required />
@@ -13,6 +14,7 @@
 <script setup lang="ts">
 import { TaskStatus, type Task } from '@/model/task';
 import { ref } from 'vue';
+import ModeToggle from './ModeToggle.vue';
 
 let title = ref('');
 let description = ref('');
@@ -54,3 +56,14 @@ const addTask = async () => {
 
 
 </script>
+
+<style scoped>
+.input-aggiunta {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle {
+    margin-left: auto;
+}
+</style>

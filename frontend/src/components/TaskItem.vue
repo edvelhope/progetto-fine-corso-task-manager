@@ -1,21 +1,47 @@
+<!-- TaskItem.vue -->
 <template>
-    <div class="task-item">
-        <input v-model="editedTask.title" @blur="updateTask" @keyup.enter="updateTask" />
-        <input v-model="editedTask.description" @blur="updateTask" @keyup.enter="updateTask"></input>
+    <tr>
+        <td>{{ task.id }}</td>
+        <td>
+            <input v-model="editedTask.title" @blur="updateTask" />
+        </td>
+        <td>
+            <input v-model="editedTask.description" @blur="updateTask" />
+        </td>
+        <td>
 
-        <div class="status-buttons">
-            <button v-for="option in statusOptions" :key="option"
-                :class="[statusClass(option), { active: editedTask.status === option }]" @click="changeStatus(option)">
-                {{ option }}
+            <!-- Desktop: pulsanti -->
+            <div class="status-buttons desktop-only">
+                <button v-for="option in statusOptions" :key="option"
+                    :class="[statusClass(option), { active: editedTask.status === option }]"
+                    @click="changeStatus(option)">
+                    {{ option }}
+                </button>
+            </div>
+
+            <!-- Mobile/tablet: select dropdown -->
+            <div class="mobile-only">
+                <select v-model="editedTask.status" @change="updateTask">
+                    <option v-for="option in statusOptions" :key="option" :value="option">
+                        {{ option }}
+                    </option>
+                </select>
+            </div>
+
+        </td>
+        <td>
+            <button class="delete-btn" @click="deleteTask">
+                <FontAwesomeIcon :icon="['fas', 'trash-can']" />
             </button>
-        </div>
-        <button @click="deleteTask">Elimina</button>
-    </div>
+        </td>
+    </tr>
 </template>
+
 
 <script setup lang="ts">
 import { TaskStatus, type Task } from '@/model/task';
 import { ref } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const emit = defineEmits<{
     (e: 'taskDeleted', id: number): void;
@@ -92,43 +118,319 @@ const deleteTask = async () => {
 </script>
 
 <style scoped>
-.task-item {
-    border: 1px solid #ccc;
-    padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 4px;
+/* Container principale */
+tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.status {
-    font-size: 0.9rem;
-    color: #555;
+:global(.dark) tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+tr:hover {
+    background-color: rgba(99, 102, 241, 0.02);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+:global(.dark) tr:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+td {
+    padding: 16px 12px;
+    vertical-align: middle;
+}
+
+/* Input moderni */
+input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+}
+
+:global(.dark) input {
+    background: rgba(30, 41, 59, 0.8);
+    color: #e2e8f0;
+}
+
+input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    transform: translateY(-1px);
+}
+
+:global(.dark) input:focus {
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+input:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+:global(.dark) input:hover {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+/* Bottoni di stato - Design sofisticato */
+.status-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .status-buttons button {
-    margin-right: 0.5rem;
-    padding: 0.4rem 0.8rem;
+    position: relative;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
     border: none;
-    border-radius: 4px;
+    border-radius: 16px;
     cursor: pointer;
-    color: white;
-    opacity: 0.5;
-    transition: 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
 }
 
-.status-buttons button.active {
-    opacity: 1;
-    font-weight: bold;
+.status-buttons button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
 }
 
+.status-buttons button:hover::before {
+    left: 100%;
+}
+
+.status-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Stili specifici per stato */
 .status-buttons .grey {
-    background-color: #6c757d;
+    background: linear-gradient(135deg, #a8b2be, #64748a);
+    color: white;
+    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+.status-buttons .grey.active {
+    background: linear-gradient(135deg, #334155, #1e293b);
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.6);
 }
 
 .status-buttons .yellow {
-    background-color: #ffc107;
+    background: linear-gradient(135deg, #f3dbb1, #f5ac59);
+    color: white;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.status-buttons .yellow.active {
+    background: linear-gradient(135deg, #b47009, #92590e);
+    box-shadow: 0 4px 12px rgba(146, 64, 14, 0.6);
 }
 
 .status-buttons .green {
-    background-color: #28a745;
+    background: linear-gradient(135deg, #c3f7e5, #1ea77b);
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.status-buttons .green.active {
+    background: linear-gradient(135deg, #047842, #065f28);
+    box-shadow: 0 4px 12px rgba(6, 95, 70, 0.6);
+}
+
+.status-buttons button.active {
+    transform: translateY(-1px);
+    font-weight: 700;
+}
+
+/* Bottone delete moderno con FontAwesome */
+.delete-btn {
+    position: relative;
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border: 2px solid transparent;
+    color: #dc2626;
+    font-size: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+}
+
+.delete-btn svg {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+}
+
+.delete-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.delete-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+.delete-btn:hover::before {
+    opacity: 1;
+}
+
+.delete-btn:hover svg {
+    color: white;
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.delete-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.delete-btn:active svg {
+    transform: scale(0.9);
+}
+
+/* Responsive design migliorato */
+.desktop-only {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.mobile-only {
+    display: none;
+}
+
+.mobile-only select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid transparent;
+    background: rgba(248, 250, 252, 0.9);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+:global(.dark) .mobile-only select {
+    background: rgba(30, 41, 59, 0.9);
+    color: #e2e8f0;
+}
+
+.mobile-only select:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+:global(.dark) .mobile-only select:focus {
+    background: rgba(15, 23, 42, 0.95);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none;
+    }
+
+    .mobile-only {
+        display: block;
+        margin-top: 8px;
+    }
+
+    td {
+        padding: 12px 8px;
+    }
+
+    input {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .delete-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+
+    tr:hover {
+        transform: none;
+    }
+}
+
+/* Micro animazioni per feedback */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.status-buttons button:active {
+    animation: pulse 0.2s ease-in-out;
+}
+
+/* Glassmorphism effect per un look più moderno */
+tr {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark) tr {
+    background: rgba(15, 23, 42, 0.1);
+}
+
+/* Smooth scroll per mobile */
+@media (max-width: 768px) {
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
 }
 </style>
