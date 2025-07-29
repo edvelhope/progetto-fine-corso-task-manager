@@ -124,10 +124,6 @@ tr {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-:global(.dark) tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
 tr:hover {
     background-color: rgba(99, 102, 241, 0.02);
     transform: translateY(-1px);
@@ -248,12 +244,12 @@ input:hover {
 }
 
 .status-buttons .yellow.active {
-    background: linear-gradient(135deg, #b47009, #92590e);
-    box-shadow: 0 4px 12px rgba(146, 64, 14, 0.6);
+    background: linear-gradient(135deg, #c27f1c, #b4670f);
+    box-shadow: 0 4px 12px rgba(146, 89, 14, 0.6);
 }
 
 .status-buttons .green {
-    background: linear-gradient(135deg, #c3f7e5, #1ea77b);
+    background: linear-gradient(135deg, #afecd0, #1ea75c);
     color: white;
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }

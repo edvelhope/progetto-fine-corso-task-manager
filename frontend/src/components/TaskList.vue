@@ -21,7 +21,7 @@
 <script setup lang="ts">
 
 import type { Task } from '@/model/task';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUpdated, ref } from 'vue';
 import TaskItem from './TaskItem.vue';
 
 let errorMsg = ref('');
@@ -47,6 +47,7 @@ const loadTasks = async () => {
     }
 };
 onMounted(loadTasks);
+
 </script>
 
 <style scoped>
