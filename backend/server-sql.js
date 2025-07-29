@@ -27,18 +27,28 @@ app.get("/api/task", async (req, res) => {
   }
 });
 
-// POST aggiungi task
+// POST aggiungi task — MODIFICATO per gestire due_date
 app.post("/api/task", async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, deadline, priority } = req.body;
+
+  // 🔍 DEBUG: stampa i valori ricevuti dal frontend
+  console.log("POST /api/task - dati ricevuti:");
+  console.log("Titolo:", title);
+  console.log("Descrizione:", description);
+  console.log("Scadenza:", deadline);
+  console.log("Priorità:", priority); // <-- QUI!
+
   try {
     const [result] = await db.query(
-      "INSERT INTO tasks (title, description) VALUES (?, ?)",
-      [title, description]
+      "INSERT INTO tasks (title, description, deadline, priority) VALUES (?, ?, ?, ?)",
+      [title, description, deadline, priority]
     );
     const newTask = {
       id: result.insertId,
       title,
       description,
+      deadline,
+      priority
     };
     res.json(newTask);
   } catch (error) {
@@ -47,14 +57,15 @@ app.post("/api/task", async (req, res) => {
   }
 });
 
-// PUT modifica task
+// PUT modifica task — MODIFICATO per gestire due_date
 app.put("/api/task/:id", async (req, res) => {
   const { id } = req.params;
-  const { title, description, status } = req.body;
+  const { title, description, status, deadline, priority } = req.body; // aggiunto dueDate
+
   try {
     await db.query(
-      "UPDATE tasks SET title = ?, description = ?, status = ? WHERE id = ?",
-      [title, description, status, id]
+      "UPDATE tasks SET title = ?, description = ?, status = ?, deadline = ?, priority = ? WHERE id = ?", // modificata query
+      [title, description, status, deadline, priority, id] // passato dueDate
     );
     res.json({ message: "Task aggiornata" });
   } catch (error) {
@@ -85,3 +96,4 @@ app.delete("/api/task/:id", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
