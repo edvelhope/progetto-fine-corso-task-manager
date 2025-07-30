@@ -1,33 +1,39 @@
 <template>
-    <div class="task-table">
-        <div class="search-container">
-            <FontAwesomeIcon icon="search" class="search-icon" />
-            <input type="text" v-model="searchQuery" placeholder="Cerca per titolo o descrizione..."
-                class="search-input" />
+    <div>
+        <!-- Dropdown per ordinamento -->
+        <label for="sort">&nbsp;Ordina per:&nbsp;</label>
+        <select id="sort" v-model="sortBy" style="margin-bottom: 1rem;">
+            <option value="default">Inserimento (default)</option>
+            <option value="priority">Priorità</option>
+            <option value="deadline">Scadenza</option>
+        </select>
+
+        <div class="task-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Titolo</th>
+                        <th>Descrizione</th>
+                        <th>Data/Priorità</th>
+                        <th>Status</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Ora uso sortedTasks -->
+                    <TaskItem v-for="task in sortedTasks" :key="task.id" :task="task"
+                        @taskDeleted="handleTaskDeleted" />
+                </tbody>
+            </table>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titolo</th>
-                    <th>Descrizione</th>
-                    <th>Status</th>
-                    <th>Azioni</th>
-                </tr>
-            </thead>
-            <tbody>
-                <TaskItem v-for="task in filteredTasks" :key="task.id" :task="task" @taskDeleted="handleTaskDeleted" />
-            </tbody>
-        </table>
     </div>
 </template>
 
 
-
 <script setup lang="ts">
-
 import type { Task } from '@/model/task';
-import { onMounted, onUpdated, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import TaskItem from './TaskItem.vue';
 import { computed } from 'vue';
 
@@ -35,17 +41,33 @@ import { computed } from 'vue';
 let errorMsg = ref('');
 let tasks = ref<Task[]>([]);
 
-const searchQuery = ref('');
+// Stato per ordinamento
+const sortBy = ref('default');
 
-const filteredTasks = computed(() =>
-    tasks.value.filter(task => {
-        const q = searchQuery.value.toLowerCase();
-        return (
-            task.title.toLowerCase().includes(q) ||
-            task.description.toLowerCase().includes(q)
-        );
-    })
-);
+const priorityOrder = { 'Alta': 1, 'Media': 2, 'Bassa': 3 };
+
+// Computed che restituisce la lista ordinata
+const sortedTasks = computed(() => {
+    const priorityOrder: Record<string, number> = {
+        Alta: 1,
+        Media: 2,
+        Bassa: 3,
+    };
+
+    return [...tasks.value].sort((a, b) => {
+        if (sortBy.value === 'priority') {
+            const aPriority = a.priority ?? '';
+            const bPriority = b.priority ?? '';
+            return (priorityOrder[aPriority] ?? 99) - (priorityOrder[bPriority] ?? 99);
+        }
+        if (sortBy.value === 'deadline') {
+            const aDate = a.deadline ? new Date(a.deadline).getTime() : 0;
+            const bDate = b.deadline ? new Date(b.deadline).getTime() : 0;
+            return aDate - bDate;
+        }
+        return a.id - b.id; // default ordinamento per ID
+    });
+});
 
 
 const handleTaskDeleted = (id: number) => {
@@ -55,66 +77,29 @@ const handleTaskDeleted = (id: number) => {
 const loadTasks = async () => {
     try {
         const response = await fetch('http://localhost:8080/api/task');
-
         if (!response.ok) throw new Error(`Errore server: ${response.status}`);
 
         tasks.value = await response.json();
-
         errorMsg.value = '';
-
     } catch (err) {
         console.error('Errore nella fetch:', err);
         errorMsg.value = 'Errore nel caricamento delle tasks';
     }
 };
 onMounted(loadTasks);
-
 </script>
-
 <style scoped>
-.search-container {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 1rem;
-    margin-top: 1rem;
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px 14px 10px 40px;
-    /* padding a sinistra aumentato */
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-}
-
-.search-icon {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #888;
-    font-size: 16px;
-    pointer-events: none;
-}
-
-.search-input::placeholder {
-    color: var(--text-secondary);
-}
-
-.dark .search-input {
-    border-color: rgba(255, 255, 255, 0.2);
-}
 
 .task-table {
-    width: 100%;
+    width: 90%;
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    /* centra orizzontalmente e margine sopra e sotto */
     overflow-x: auto;
-    margin-top: 1rem;
     border: 1px solid #ccc;
     border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: white;
 }
 
 .task-table table {
@@ -140,7 +125,6 @@ onMounted(loadTasks);
 .task-table td:last-child,
 .task-table th:last-child {
     width: 60px;
-    /* o anche 60px, se vuoi più stretto */
     text-align: center;
 }
 
@@ -153,6 +137,6 @@ onMounted(loadTasks);
 }
 
 .task-table tbody tr:hover {
-    background-color: #f0f8ff;
+    background-color: #a3bbcf;
 }
 </style>
