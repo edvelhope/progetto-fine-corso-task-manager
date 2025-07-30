@@ -40,7 +40,7 @@
 
 
             <button type="submit" class="fancy-button">
-                <FontAwesomeIcon :icon="['fas', 'circle-plus']" size="lg" />
+               Aggiungi task<FontAwesomeIcon :icon="['fas', 'circle-plus']" size="lg" />
             </button>
         </form>
     </div>
@@ -228,5 +228,21 @@ const addTask = async () => {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-right: 8px;
+}
+
+@media only screen and (max-width: 992px) {
+    .task-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-title {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .fancy-button {
+        width: 200px;
+    }
 }
 </style>

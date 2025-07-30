@@ -10,7 +10,12 @@
 
         </select>
 
-        <div class="task-table">
+        <div v-if="sortedTasks.length === 0" class="empty-state">
+            <div class="icon">⌛</div>
+            <p>Nessuna task al momento</p>
+        </div>
+
+        <div v-else class="task-table">
             <table>
                 <thead>
                     <tr>
@@ -164,5 +169,50 @@ onMounted(loadTasks);
 
 .task-table tbody tr:hover {
     background-color: #a3bbcf;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 4rem 0;
+    color: #ccc;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: bounce 1.5s infinite;
+}
+
+.empty-state p {
+    font-size: 1.3rem;
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
 }
 </style>
