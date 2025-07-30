@@ -6,6 +6,8 @@
             <option value="default">Inserimento (default)</option>
             <option value="priority">Priorità</option>
             <option value="deadline">Scadenza</option>
+            <option value="week">Questa settimana</option>
+
         </select>
 
         <div class="task-table">
@@ -51,20 +53,36 @@ const sortedTasks = computed(() => {
         Bassa: 3,
     };
 
+    if (sortBy.value === 'week') {
+        const now = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(now.getDate() + 7);
+
+        // filtro task con scadenza tra oggi e 7 giorni dopo
+        return tasks.value.filter((task: Task) => {
+            if (!task.deadline) return false;
+            const deadline = new Date(task.deadline);
+            return deadline >= now && deadline <= nextWeek;
+        });
+    }
+
     return [...tasks.value].sort((a, b) => {
         if (sortBy.value === 'priority') {
             const aPriority = a.priority ?? '';
             const bPriority = b.priority ?? '';
             return (priorityOrder[aPriority] ?? 99) - (priorityOrder[bPriority] ?? 99);
         }
+
         if (sortBy.value === 'deadline') {
             const aDate = a.deadline ? new Date(a.deadline).getTime() : 0;
             const bDate = b.deadline ? new Date(b.deadline).getTime() : 0;
             return aDate - bDate;
         }
+
         return a.id - b.id; // default ordinamento per ID
     });
 });
+
 
 
 const handleTaskDeleted = (id: number) => {
