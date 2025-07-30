@@ -1,34 +1,47 @@
 <template>
-    <div>
-        <!-- Dropdown per ordinamento -->
-        <label for="sort">&nbsp;Ordina per:&nbsp;</label>
-        <select id="sort" v-model="sortBy" style="margin-bottom: 1rem;">
-            <option value="default">Inserimento (default)</option>
-            <option value="priority">Priorità</option>
-            <option value="deadline">Scadenza</option>
-        </select>
+  <div>
+   
+    <label for="sort">&nbsp;Ordina per:&nbsp;</label>
+    <select id="sort" v-model="sortBy" style="margin-bottom: 1rem;">
+      <option value="default">Inserimento (default)</option>
+      <option value="priority">Priorità</option>
+      <option value="deadline">Scadenza</option>
+    </select>
 
-        <div class="task-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Titolo</th>
-                        <th>Descrizione</th>
-                        <th>Data/Priorità</th>
-                        <th>Status</th>
-                        <th>Azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Ora uso sortedTasks -->
-                    <TaskItem v-for="task in sortedTasks" :key="task.id" :task="task"
-                        @taskDeleted="handleTaskDeleted" />
-                </tbody>
-            </table>
-        </div>
+   
+
+    <div v-if="sortedTasks.length === 0" class="empty-state">
+      <div class="icon">⌛</div>
+      <p>Nessuna task al momento</p>
     </div>
+
+    
+    <div v-else class="task-table">
+      <table>
+        <thead>
+  <tr>
+    <th>ID</th>
+    <th>Titolo</th>
+    <th>Descrizione</th>
+    <th>Data/Priorità</th>
+    <th>Status</th>
+    <th>Azioni</th>
+  </tr>
+</thead>
+
+        <tbody>
+          <TaskItem
+            v-for="task in sortedTasks"
+            :key="task.id"
+            :task="task"
+            @taskDeleted="handleTaskDeleted"
+          />
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import type { Task } from '@/model/task';
@@ -38,12 +51,12 @@ import TaskItem from './TaskItem.vue';
 let errorMsg = ref('');
 let tasks = ref<Task[]>([]);
 
-// Stato per ordinamento
+
 const sortBy = ref('default');
 
 const priorityOrder = { 'Alta': 1, 'Media': 2, 'Bassa': 3 };
 
-// Computed che restituisce la lista ordinata
+
 const sortedTasks = computed(() => {
     const priorityOrder: Record<string, number> = {
         Alta: 1,
@@ -85,6 +98,8 @@ const loadTasks = async () => {
 };
 onMounted(loadTasks);
 </script>
+
+
 <style scoped>
 .task-table {
     width: 90%;
@@ -135,4 +150,36 @@ onMounted(loadTasks);
 .task-table tbody tr:hover {
     background-color: #a3bbcf;
 }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem 0;
+  color: #ccc;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: bounce 1.5s infinite;
+}
+
+.empty-state p {
+  font-size: 1.3rem;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
 </style>

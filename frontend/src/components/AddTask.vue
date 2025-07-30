@@ -30,19 +30,13 @@
             <div class="form-group">
                 <input type="date" v-model="deadline" placeholder="Data di scadenza" />
             </div>
-            <div class="form-group">
-                <select v-model="priority" required>
-                    <option value="Alta">Alta</option>
-                    <option value="Media">Media</option>
-                    <option value="Bassa">Bassa</option>
-                </select>
-            </div>
 
 
             <button type="submit" class="fancy-button">
                 <FontAwesomeIcon :icon="['fas', 'circle-plus']" size="lg" />
             </button>
         </form>
+
     </div>
 </template>
 
@@ -56,6 +50,7 @@ let title = ref('');
 let description = ref('');
 let deadline = ref('');
 let priority = ref('Media'); // Default priority
+
 
 let tasks = ref<Task[]>([]);
 let errorMsg = ref('');

@@ -52,6 +52,7 @@
                 <FontAwesomeIcon :icon="['fas', 'trash-can']" />
             </button>
         </td>
+
     </tr>
 </template>
 

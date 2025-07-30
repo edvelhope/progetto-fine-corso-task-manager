@@ -5,10 +5,12 @@ export enum TaskStatus {
 }
 
 export interface Task {
-  id: number
-  title: string
-  description: string
-  status: TaskStatus
-  deadline?: string
-  priority?: string // <--- aggiungi questa riga
+  id: number;
+  title: string;
+  description: string;
+  status: TaskStatus | 'da fare' | 'in corso' | 'completata';
+  deadline?: string;
+  date?: string;
+  priority?: 'Alta' | 'Media' | 'Bassa';
+  link?: string;
 }
