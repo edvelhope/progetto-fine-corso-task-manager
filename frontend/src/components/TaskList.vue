@@ -15,18 +15,15 @@
                         <th>ID</th>
                         <th>Titolo</th>
                         <th>Descrizione</th>
+                        <th>Data/Priorità</th>
                         <th>Status</th>
                         <th>Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- Ora uso sortedTasks -->
-                    <TaskItem
-                        v-for="task in sortedTasks"
-                        :key="task.id"
-                        :task="task"
-                        @taskDeleted="handleTaskDeleted"
-                    />
+                    <TaskItem v-for="task in sortedTasks" :key="task.id" :task="task"
+                        @taskDeleted="handleTaskDeleted" />
                 </tbody>
             </table>
         </div>
@@ -48,25 +45,25 @@ const priorityOrder = { 'Alta': 1, 'Media': 2, 'Bassa': 3 };
 
 // Computed che restituisce la lista ordinata
 const sortedTasks = computed(() => {
-  const priorityOrder: Record<string, number> = {
-    Alta: 1,
-    Media: 2,
-    Bassa: 3,
-  };
+    const priorityOrder: Record<string, number> = {
+        Alta: 1,
+        Media: 2,
+        Bassa: 3,
+    };
 
-  return [...tasks.value].sort((a, b) => {
-    if (sortBy.value === 'priority') {
-      const aPriority = a.priority ?? '';
-      const bPriority = b.priority ?? '';
-      return (priorityOrder[aPriority] ?? 99) - (priorityOrder[bPriority] ?? 99);
-    }
-    if (sortBy.value === 'deadline') {
-      const aDate = a.deadline ? new Date(a.deadline).getTime() : 0;
-      const bDate = b.deadline ? new Date(b.deadline).getTime() : 0;
-      return aDate - bDate;
-    }
-    return a.id - b.id; // default ordinamento per ID
-  });
+    return [...tasks.value].sort((a, b) => {
+        if (sortBy.value === 'priority') {
+            const aPriority = a.priority ?? '';
+            const bPriority = b.priority ?? '';
+            return (priorityOrder[aPriority] ?? 99) - (priorityOrder[bPriority] ?? 99);
+        }
+        if (sortBy.value === 'deadline') {
+            const aDate = a.deadline ? new Date(a.deadline).getTime() : 0;
+            const bDate = b.deadline ? new Date(b.deadline).getTime() : 0;
+            return aDate - bDate;
+        }
+        return a.id - b.id; // default ordinamento per ID
+    });
 });
 
 
@@ -92,11 +89,12 @@ onMounted(loadTasks);
 .task-table {
     width: 90%;
     max-width: 1200px;
-    margin: 1.5rem auto; /* centra orizzontalmente e margine sopra e sotto */
+    margin: 1.5rem auto;
+    /* centra orizzontalmente e margine sopra e sotto */
     overflow-x: auto;
     border: 1px solid #ccc;
     border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     background: white;
 }
 
@@ -135,7 +133,6 @@ onMounted(loadTasks);
 }
 
 .task-table tbody tr:hover {
-    background-color: #f0f8ff;
+    background-color: #a3bbcf;
 }
-
 </style>

@@ -9,23 +9,23 @@
             <input v-model="editedTask.description" @blur="updateTask" />
         </td>
         <td>
-    {{ editedTask.deadline ? new Date(editedTask.deadline).toLocaleDateString() : 'Nessuna' }}
-    <div v-if="isExpired" class="expired-warning">
-                 ⚠️Task scaduta!
-</div>
-       <div :class="['priority-label', getPriorityClass(task.priority || '')]">
+            {{ editedTask.deadline ? new Date(editedTask.deadline).toLocaleDateString() : 'Nessuna' }}
+            <div v-if="isExpired" class="expired-warning">
+                ⚠️Task scaduta!
+            </div>
+            <div :class="['priority-label', getPriorityClass(task.priority || '')]">
 
-  Priorità: {{ task.priority }}
-</div>
+                Priorità: {{ task.priority }}
+            </div>
 
 
-</td>
+        </td>
 
 
 
 
         <td>
-     
+
 
 
             <!-- Desktop: pulsanti -->
@@ -63,11 +63,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed } from 'vue';
 
 const isExpired = computed(() => {
-  if (!props.task.deadline) return false;
-  const today = new Date();
-  const deadlineDate = new Date(props.task.deadline);
-  // Confronta solo la data, non l'orario
-  return deadlineDate < new Date(today.toDateString());
+    if (!props.task.deadline) return false;
+    const today = new Date();
+    const deadlineDate = new Date(props.task.deadline);
+    // Confronta solo la data, non l'orario
+    return deadlineDate < new Date(today.toDateString());
 });
 
 
@@ -80,16 +80,16 @@ const props = defineProps<{
     task: Task
 }>();
 const getPriorityClass = (priority: string) => {
-  switch (priority.toLowerCase()) {
-    case 'alta':
-      return 'priority-high';
-    case 'media':
-      return 'priority-medium';
-    case 'bassa':
-      return 'priority-low';
-    default:
-      return '';
-  }
+    switch (priority.toLowerCase()) {
+        case 'alta':
+            return 'priority-high';
+        case 'media':
+            return 'priority-medium';
+        case 'bassa':
+            return 'priority-low';
+        default:
+            return '';
+    }
 };
 
 
@@ -164,11 +164,13 @@ tr {
     transition: all 0.2s ease;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
+
 .priority-label {
-  font-weight: bold;
-  color: #3b82f6; /* blu */
-  margin-top: 0.3rem;
-  text-transform: capitalize;
+    font-weight: bold;
+    color: #3b82f6;
+    /* blu */
+    margin-top: 0.3rem;
+    text-transform: capitalize;
 }
 
 
@@ -206,17 +208,18 @@ input {
     background: rgba(30, 41, 59, 0.8);
     color: #e2e8f0;
 }
+
 .priority-high {
-  color: red;
-  font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 
 .priority-medium {
-  color: orange;
+    color: orange;
 }
 
 .priority-low {
-  color: green;
+    color: green;
 }
 
 
@@ -483,10 +486,11 @@ tr {
 :global(.dark) tr {
     background: rgba(15, 23, 42, 0.1);
 }
+
 .expired-warning {
-  color: red;
-  font-weight: bold;
-  margin-top: 0.5rem;
+    color: red;
+    font-weight: bold;
+    margin-top: 0.5rem;
 }
 
 

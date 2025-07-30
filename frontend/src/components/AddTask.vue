@@ -31,12 +31,12 @@
                 <input type="date" v-model="deadline" placeholder="Data di scadenza" />
             </div>
             <div class="form-group">
-  <select v-model="priority" required>
-    <option value="Alta">Alta</option>
-    <option value="Media">Media</option>
-    <option value="Bassa">Bassa</option>
-  </select>
-</div>
+                <select v-model="priority" required>
+                    <option value="Alta">Alta</option>
+                    <option value="Media">Media</option>
+                    <option value="Bassa">Bassa</option>
+                </select>
+            </div>
 
 
             <button type="submit" class="fancy-button">
@@ -74,13 +74,13 @@ const addTask = async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-        body: JSON.stringify({ 
-  title: title.value, 
-  description: description.value, 
-  status: TaskStatus.TODO,
-  deadline: deadline.value || null,
-  priority: priority.value || 'Media' // <-- default
-})
+            body: JSON.stringify({
+                title: title.value,
+                description: description.value,
+                status: TaskStatus.TODO,
+                deadline: deadline.value || null,
+                priority: priority.value || 'Media' // <-- default
+            })
 
 
         });
@@ -146,12 +146,13 @@ const addTask = async () => {
     border-radius: 6px;
     width: 200px;
 }
+
 .form-group select {
-  padding: 0.6rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  width: 200px;
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 200px;
 }
 
 
@@ -198,32 +199,34 @@ const addTask = async () => {
     transform: scale(0.98);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+
 .sort-select {
-  font-weight: 700;
-  font-size: 1rem;
-  color: #2c3e50;
-  padding: 6px 12px;
-  border: none;
-  border-bottom: 2px solid #3498db;
-  background: transparent;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  outline: none;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #2c3e50;
+    padding: 6px 12px;
+    border: none;
+    border-bottom: 2px solid #3498db;
+    background: transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    outline: none;
 }
 
 .sort-select:focus {
-  outline: none;
-  border-color: #1d4ed8; /* un blu più scuro al focus */
-  background: #f0f9ff;
-}
-.sort-label {
-  font-weight: 700;
-  font-size: 1rem;
-  color: #2c3e50;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-right: 8px;
+    outline: none;
+    border-color: #1d4ed8;
+    /* un blu più scuro al focus */
+    background: #f0f9ff;
 }
 
+.sort-label {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 8px;
+}
 </style>
