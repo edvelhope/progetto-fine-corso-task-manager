@@ -9,6 +9,24 @@
             <input v-model="editedTask.description" @blur="updateTask" />
         </td>
         <td>
+    {{ editedTask.deadline ? new Date(editedTask.deadline).toLocaleDateString() : 'Nessuna' }}
+    <div v-if="isExpired" class="expired-warning">
+                 ⚠️Task scaduta!
+</div>
+       <div :class="['priority-label', getPriorityClass(task.priority || '')]">
+
+  Priorità: {{ task.priority }}
+</div>
+
+
+</td>
+
+
+
+
+        <td>
+     
+
 
             <!-- Desktop: pulsanti -->
             <div class="status-buttons desktop-only">
@@ -42,6 +60,16 @@
 import { TaskStatus, type Task } from '@/model/task';
 import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { computed } from 'vue';
+
+const isExpired = computed(() => {
+  if (!props.task.deadline) return false;
+  const today = new Date();
+  const deadlineDate = new Date(props.task.deadline);
+  // Confronta solo la data, non l'orario
+  return deadlineDate < new Date(today.toDateString());
+});
+
 
 const emit = defineEmits<{
     (e: 'taskDeleted', id: number): void;
@@ -51,6 +79,19 @@ const emit = defineEmits<{
 const props = defineProps<{
     task: Task
 }>();
+const getPriorityClass = (priority: string) => {
+  switch (priority.toLowerCase()) {
+    case 'alta':
+      return 'priority-high';
+    case 'media':
+      return 'priority-medium';
+    case 'bassa':
+      return 'priority-low';
+    default:
+      return '';
+  }
+};
+
 
 const editedTask = ref({ ...props.task });
 
@@ -123,6 +164,13 @@ tr {
     transition: all 0.2s ease;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
+.priority-label {
+  font-weight: bold;
+  color: #3b82f6; /* blu */
+  margin-top: 0.3rem;
+  text-transform: capitalize;
+}
+
 
 tr:hover {
     background-color: rgba(99, 102, 241, 0.02);
@@ -158,6 +206,19 @@ input {
     background: rgba(30, 41, 59, 0.8);
     color: #e2e8f0;
 }
+.priority-high {
+  color: red;
+  font-weight: bold;
+}
+
+.priority-medium {
+  color: orange;
+}
+
+.priority-low {
+  color: green;
+}
+
 
 input:focus {
     outline: none;
@@ -422,6 +483,12 @@ tr {
 :global(.dark) tr {
     background: rgba(15, 23, 42, 0.1);
 }
+.expired-warning {
+  color: red;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
 
 /* Smooth scroll per mobile */
 @media (max-width: 768px) {
