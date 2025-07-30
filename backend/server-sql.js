@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = 8080;
@@ -12,44 +14,52 @@ app.use(
 );
 app.use(express.json()); // Usa il parser JSON integrato di Express
 
-// GET lista tasks
-app.get("/api/task", async (req, res) => {
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.sendStatus(401);
+  const token = authHeader.split(" ")[1];
+
   try {
-    console.log("Tentativo di recupero tasks...");
-    const [rows] = await db.query("SELECT * FROM tasks");
-    console.log("Tasks recuperate:", rows);
+    const decoded = jwt.verify(token, "segretissimo"); // cambia con una chiave più sicura
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.sendStatus(403);
+  }
+}
+
+// GET lista tasks con autenticazione
+app.get("/api/task", authenticate, async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM tasks WHERE user_id = ?", [
+      req.user.id,
+    ]);
     res.json(rows);
   } catch (error) {
-    console.error("Errore GET tasks - Dettagli completi:", error);
-    console.error("Errore message:", error.message);
-    console.error("Errore code:", error.code);
+    console.error("Errore GET tasks", error);
     res.status(500).json({ error: "Errore nel recupero tasks" });
   }
 });
 
-// POST aggiungi task — MODIFICATO per gestire due_date
-app.post("/api/task", async (req, res) => {
+// POST aggiungi task collegata a user
+app.post("/api/task", authenticate, async (req, res) => {
   const { title, description, deadline, priority } = req.body;
-
-  // 🔍 DEBUG: stampa i valori ricevuti dal frontend
-  console.log("POST /api/task - dati ricevuti:");
-  console.log("Titolo:", title);
-  console.log("Descrizione:", description);
-  console.log("Scadenza:", deadline);
-  console.log("Priorità:", priority); // <-- QUI!
+  const userId = req.user.id;
 
   try {
     const [result] = await db.query(
-      "INSERT INTO tasks (title, description, deadline, priority) VALUES (?, ?, ?, ?)",
-      [title, description, deadline, priority]
+      "INSERT INTO tasks (title, description, deadline, priority, user_id) VALUES (?, ?, ?, ?, ?)",
+      [title, description, deadline, priority, userId]
     );
+
     const newTask = {
       id: result.insertId,
       title,
       description,
       deadline,
-      priority
+      priority,
     };
+
     res.json(newTask);
   } catch (error) {
     console.error("Errore POST task", error);
@@ -92,8 +102,48 @@ app.delete("/api/task/:id", async (req, res) => {
   }
 });
 
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
+
+    if (rows.length === 0)
+      return res.status(401).json({ error: "Utente non trovato" });
+
+    const user = rows[0];
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(401).json({ error: "Password errata" });
+
+    const token = jwt.sign({ id: user.id, email: user.email }, "segretissimo", {
+      expiresIn: "1h",
+    });
+
+    res.json({ token });
+  } catch (error) {
+    console.error("Errore login", error);
+    res.status(500).json({ error: "Errore durante il login" });
+  }
+});
+
+function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.sendStatus(401);
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, "segretissimo"); // cambia con una chiave più sicura
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.sendStatus(403);
+  }
+}
+
 // Avvia il server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-

@@ -73,7 +73,18 @@ const handleTaskDeleted = (id: number) => {
 
 const loadTasks = async () => {
     try {
-        const response = await fetch('http://localhost:8080/api/task');
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            throw new Error('Utente non autenticato');
+        }
+
+        const response = await fetch('http://localhost:8080/api/task', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
         if (!response.ok) throw new Error(`Errore server: ${response.status}`);
 
         tasks.value = await response.json();
@@ -83,6 +94,7 @@ const loadTasks = async () => {
         errorMsg.value = 'Errore nel caricamento delle tasks';
     }
 };
+
 onMounted(loadTasks);
 </script>
 <style scoped>

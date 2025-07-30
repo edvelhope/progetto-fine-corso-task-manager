@@ -52,6 +52,7 @@ import { ref } from 'vue';
 import ModeToggle from './ModeToggle.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+
 let title = ref('');
 let description = ref('');
 let deadline = ref('');
@@ -73,16 +74,15 @@ const addTask = async () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('token')}` // 👈 Token usato per identificare l'utente
             },
             body: JSON.stringify({
                 title: title.value,
                 description: description.value,
                 status: TaskStatus.TODO,
                 deadline: deadline.value || null,
-                priority: priority.value || 'Media' // <-- default
+                priority: priority.value || 'Media'
             })
-
-
         });
 
         if (!response.ok) throw new Error(`Errore server: ${response.status}`);

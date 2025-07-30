@@ -117,23 +117,38 @@ const statusClass = (option: TaskStatus) => {
 
 const updateTask = async () => {
     try {
-        const response = await fetch(`http://localhost:8080/api/task/${editedTask.value.id}`, {
+        const taskToSend = {
+            id: editedTask.value.id,
+            title: editedTask.value.title || '',
+            description: editedTask.value.description || '',
+            status: editedTask.value.status || 'Da fare',
+            deadline: editedTask.value.deadline
+                ? new Date(editedTask.value.deadline).toISOString().slice(0, 10)
+                : null,
+            priority: editedTask.value.priority || 'Media'
+        };
+
+        const response = await fetch(`http://localhost:8080/api/task/${taskToSend.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(editedTask.value)
+            body: JSON.stringify(taskToSend)
         });
 
-        if (!response.ok) throw new Error('Errore aggiornamento');
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Errore aggiornamento: ${errText}`);
+        }
 
-        // const updated = await response.json();
-        // emit('taskUpdated', updated);
+        // opzionale: puoi emettere evento al genitore se vuoi notificare il successo
+        // emit('taskUpdated', taskToSend);
 
     } catch (error) {
         console.error('Errore nel salvataggio automatico:', error);
     }
 };
+
 
 const changeStatus = (newStatus: TaskStatus) => {
     if (editedTask.value.status === newStatus) return;
