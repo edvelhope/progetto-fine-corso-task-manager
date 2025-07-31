@@ -35,6 +35,9 @@ Questa è una semplice applicazione di gestione task con autenticazione utente. 
 git clone https://github.com/tuo-utente/nome-repo.git
 cd nome-repo○
 ```
+
+---
+
 ## 🔧 2. Configurazione database
 
 CREATE DATABASE IF NOT EXISTS todo_db;
@@ -67,7 +70,9 @@ CREATE TABLE users (
 
 Crea un file db.js nella cartella backend, con le istruzioni in db.example.js.
 
-## 🔧 3. Configurazione database
+---
+
+## 🔧 3. Avvio dell'App
 
 cd backend
 npm install
