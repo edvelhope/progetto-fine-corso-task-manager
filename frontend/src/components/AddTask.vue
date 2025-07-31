@@ -12,7 +12,6 @@
 </template> -->
 <template>
     <div class="add-task-wrapper">
-        <ModeToggle class="toggle" />
         <h3 class="form-title">
             <FontAwesomeIcon :icon="['fas', 'file-pen']" />
             Aggiungi Nuova Task
@@ -40,7 +39,8 @@
 
 
             <button type="submit" class="fancy-button">
-               Aggiungi task<FontAwesomeIcon :icon="['fas', 'circle-plus']" size="lg" />
+                Aggiungi task
+                <FontAwesomeIcon :icon="['fas', 'circle-plus']" size="lg" />
             </button>
         </form>
     </div>
@@ -49,7 +49,6 @@
 <script setup lang="ts">
 import { TaskStatus, type Task } from '@/model/task';
 import { ref } from 'vue';
-import ModeToggle from './ModeToggle.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 
@@ -106,10 +105,6 @@ const addTask = async () => {
 </script>
 
 <style scoped>
-.toggle {
-    margin-left: auto;
-}
-
 .add-task-wrapper {
     display: flex;
     flex-direction: column;

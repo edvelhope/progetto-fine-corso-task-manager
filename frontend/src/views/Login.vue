@@ -50,7 +50,6 @@ body {
   height: 100vh;
 }
 
-
 .login {
   max-width: 400px;
   margin: 0 auto;
@@ -58,7 +57,7 @@ body {
   background-color: #1a2238;
   padding: 2rem;
   border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   text-align: center;
   color: white;
 }
@@ -69,7 +68,6 @@ body {
   opacity: 1;
   margin-bottom: 1rem;
 }
-
 
 .login input {
   width: 100%;
@@ -82,42 +80,56 @@ body {
   font-size: 1rem;
 }
 
-
 .login input::placeholder {
   color: #bbb;
 }
 
-
+/* Pulsante Accedi stile fancy */
 .login button {
+  position: relative;
   width: 100%;
-  padding: 12px;
-  background-color: #3b5bfd;
-  color: white;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 600;
   border: none;
-  border-radius: 5px;
-  font-weight: bold;
+  border-radius: 30px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(135deg, #a8b2be, #64748a);
+  color: white;
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+  pointer-events: none;
+}
+
+.login button:hover::before {
+  left: 100%;
 }
 
 .login button:hover {
-  background-color: #2e4de0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-
-
-a,
-.router-link-active,
-.router-link-exact-active {
-  color: white !important;
-  text-decoration: none;
-  font-weight: bold;
+.login button:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
-
-
-a:hover {
-  color: #3b5bfd;
-}
-
 </style>

@@ -129,6 +129,30 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// POST per regisgtrazione nuovi utenti
+app.post("/api/register", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return res.status(400).json({ error: "Email e password obbligatorie" });
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db.query("INSERT INTO users (email, password) VALUES (?, ?)", [
+      email,
+      hashedPassword,
+    ]);
+    res.status(201).json({ message: "Utente registrato con successo" });
+  } catch (err) {
+    console.error("Errore registrazione:", err);
+    if (err.code === "ER_DUP_ENTRY") {
+      res.status(409).json({ error: "Email già registrata" });
+    } else {
+      res.status(500).json({ error: "Errore del server" });
+    }
+  }
+});
+
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.sendStatus(401);

@@ -1,11 +1,10 @@
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
 
 const isAuthenticated = ref(localStorage.getItem('token') !== null);
 
 const login = (token: string) => {
-    localStorage.setItem('token', token);
-    isAuthenticated.value = true;
+  localStorage.setItem('token', token);
+  isAuthenticated.value = true;
 };
 
 const logout = () => {
@@ -14,7 +13,7 @@ const logout = () => {
 };
 
 export default {
-    isAuthenticated,
-    login,
-    logout
+  isAuthenticated,
+  login,
+  logout
 };
