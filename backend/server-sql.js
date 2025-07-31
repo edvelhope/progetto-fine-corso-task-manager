@@ -153,20 +153,6 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-function authenticate(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.sendStatus(401);
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, "segretissimo"); // cambia con una chiave più sicura
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.sendStatus(403);
-  }
-}
-
 // Avvia il server
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
