@@ -32,7 +32,7 @@ const handleLogin = async () => {
 
     const data = await res.json()
 
-    auth.login(data.token) // <-- aggiorna lo stato di login e salva il token
+    auth.login(data.token, email.value) // <-- aggiorna lo stato di login e dell'email e salva il token
 
     router.push('/')
   } catch (err: any) {

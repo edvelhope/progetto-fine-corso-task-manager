@@ -3,7 +3,8 @@ import { RouterLink, RouterView, useRouter } from 'vue-router';
 import auth from '@/stores/auth';
 import ModeToggle from './components/ModeToggle.vue';
 
-const { isAuthenticated, logout } = auth;
+
+const { isAuthenticated, logout, userEmail } = auth;
 const router = useRouter();
 
 const handleLogout = () => {
@@ -21,8 +22,18 @@ const handleLogout = () => {
         <RouterLink v-if="!isAuthenticated" to="/register">Registrati</RouterLink>
       </nav>
     </div>
-    <div class="logout-btn-box">
 
+    <div v-if="isAuthenticated" class="user-badge" @click="console.log('Apri profilo utente')">
+      <div class="user-avatar">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+        </svg>
+      </div>
+      <span class="user-email">{{ userEmail }}</span>
+    </div>
+
+    <div class="logout-btn-box">
       <button v-if="isAuthenticated" @click="handleLogout" class="logout-btn">
         <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -86,6 +97,55 @@ nav button {
   position: relative;
   transition: color 0.3s ease;
 }
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  background-color: var(--bg-primary);
+  border-radius: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 1rem;
+}
+
+.user-badge:hover {
+  background-color: var(--bg-secondary);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  transition: transform 0.3s ease;
+}
+
+.user-badge:hover .user-avatar {
+  transform: scale(1.05);
+}
+
+.user-avatar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.user-email {
+  font-size: 0.875rem;
+  font-weight: 500;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 .logout-btn-box {
   margin-right: 4rem;
