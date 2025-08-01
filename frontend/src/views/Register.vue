@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import TaskLineLogo from '@/components/TaskLineLogo.vue';
+import TaskLineLogo from '../../src/components/TasklineLogo.vue'
 
 const email = ref('');
 const password = ref('');

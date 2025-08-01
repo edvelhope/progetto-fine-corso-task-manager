@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AddTask from '@/components/AddTask.vue';
 import TaskList from '@/components/TaskList.vue';
-import TaskLineLogo from '@/components/TaskLineLogo.vue';
 
 defineEmits(['routeChanged'])
 

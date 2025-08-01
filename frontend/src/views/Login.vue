@@ -17,7 +17,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import auth from '@/stores/auth'  // <-- importa lo store auth
-import TaskLineLogo from '@/components/TaskLineLogo.vue'
+import TaskLineLogo from '../../src/components/TasklineLogo.vue'
+
 
 const email = ref('')
 const password = ref('')
