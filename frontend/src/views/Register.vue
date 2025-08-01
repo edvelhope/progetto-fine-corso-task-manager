@@ -65,7 +65,7 @@ body {
     max-width: 400px;
     margin: 0 auto;
     margin-top: 10vh;
-    background-color: #1a2238;
+    background-color: var(--bg-primary);
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
@@ -74,7 +74,7 @@ body {
 }
 
 .register h2 {
-    color: #ffffff;
+    color: var(--text-primary);
     font-weight: bold;
     opacity: 1;
     margin-bottom: 1rem;
@@ -84,9 +84,8 @@ body {
     width: 100%;
     padding: 12px;
     margin-bottom: 1rem;
-    border: none;
+    border-color: var(--border-color);
     border-radius: 5px;
-    background-color: #2a2f45;
     color: white;
     font-size: 1rem;
 }
