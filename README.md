@@ -48,7 +48,7 @@ CREATE TABLE tasks (
   description TEXT,
   status ENUM('da fare', 'in corso', 'completata') DEFAULT 'da fare',
   deadline DATE,
-  priority ENUM('alta', 'media', 'bassa') DEFAULT 'media',
+  priority ENUM('Alta', 'Media', 'Bassa') DEFAULT 'media',
   user_id INT,
   PRIMARY KEY (id)
 ) ENGINE = InnoDB
