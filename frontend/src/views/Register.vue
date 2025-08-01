@@ -86,7 +86,6 @@ body {
     margin-bottom: 1rem;
     border-color: var(--border-color);
     border-radius: 5px;
-    color: white;
     font-size: 1rem;
 }
 
