@@ -1,5 +1,8 @@
 <template>
     <div class="register">
+        <div class="logo-wrapper">
+            <TaskLineLogo />
+        </div>
         <h2>Registrazione</h2>
         <form @submit.prevent="register">
             <input v-model="email" type="email" placeholder="Email" required />
@@ -15,6 +18,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import TaskLineLogo from '@/components/TaskLineLogo.vue';
 
 const email = ref('');
 const password = ref('');
@@ -86,7 +90,7 @@ body {
     margin-bottom: 1rem;
     border-color: var(--border-color);
     border-radius: 5px;
-    color: white;
+
     font-size: 1rem;
 }
 
