@@ -14,7 +14,7 @@ Questa è una semplice applicazione di gestione task con autenticazione utente. 
 
 ## 🛠 Tecnologie
 
-- **Frontend:** Vue 3 + TypeScript, Vue Router
+- **Frontend:** Vue 3 + TypeScript, Vue Router, Three
 - **Backend:** Node.js + Express
 - **Database:** MySQL
 - **Altro:** bcrypt, JWT, fetch API
