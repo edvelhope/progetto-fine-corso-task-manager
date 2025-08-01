@@ -1,4 +1,3 @@
-<!-- DarkModeToggle.vue -->
 <template>
     <button @click="toggleTheme" class="theme-toggle" :class="{ 'dark': isDark }"
         :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'">

@@ -1,15 +1,3 @@
-<!-- <template>
-    <div class="input-aggiunta">
-        <ModeToggle class="toggle" />
-        <h3>Aggiungi Nuova Task</h3>
-        <form @submit="addTask">
-            <input v-model="title" name="title" placeholder="Titolo" required />
-            <input v-model="description" name="description" placeholder="Descrizione" required />
-            <button type="submit">Aggiungi Task</button>
-        </form>
-    </div>
-
-</template> -->
 <template>
     <div class="add-task-wrapper">
         <h3 class="form-title">
