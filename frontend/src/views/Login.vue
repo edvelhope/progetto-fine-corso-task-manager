@@ -1,5 +1,8 @@
 <template>
   <div class="login">
+    <div class="logo-wrapper">
+      <TaskLineLogo />
+    </div>
     <h2>Login</h2>
     <form @submit.prevent="handleLogin">
       <input v-model="email" type="email" placeholder="Email" required />
@@ -14,6 +17,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import auth from '@/stores/auth'  // <-- importa lo store auth
+import TaskLineLogo from '@/components/TaskLineLogo.vue'
 
 const email = ref('')
 const password = ref('')

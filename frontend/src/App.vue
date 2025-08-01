@@ -2,6 +2,8 @@
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import auth from '@/stores/auth';
 import ModeToggle from './components/ModeToggle.vue';
+import TasklineLogo from './components/TaskLineLogo.vue';
+
 
 
 const { isAuthenticated, logout, userEmail } = auth;
@@ -16,11 +18,14 @@ const handleLogout = () => {
 <template>
   <header>
     <div class="wrapper">
+
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink v-if="!isAuthenticated" to="/login">Login</RouterLink>
         <RouterLink v-if="!isAuthenticated" to="/register">Registrati</RouterLink>
       </nav>
+
+     
     </div>
 
     <div v-if="isAuthenticated" class="user-badge" @click="console.log('Apri profilo utente')">
@@ -49,6 +54,7 @@ const handleLogout = () => {
       <ModeToggle class="toggle" />
     </div>
   </header>
+
 
   <RouterView />
 </template>
