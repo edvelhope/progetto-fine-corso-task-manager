@@ -1,11 +1,3 @@
-GRUPPO 3
-
-Ida Cerchiara
-
-Alessio cardi
-
-Edoardo De Rosa
-
 # ✅ Task Manager App (Vue 3 + Node.js + MySQL)
 
 Questa è una semplice applicazione di gestione task con autenticazione utente. Ogni utente registrato può accedere, aggiungere/modificare/eliminare solo le **proprie task**, con priorità, scadenze e stato.
@@ -32,8 +24,8 @@ Questa è una semplice applicazione di gestione task con autenticazione utente. 
 ## 🔧 1. Clonazione del progetto
 
 ```bash
-git clone https://github.com/tuo-utente/nome-repo.git
-cd nome-repo○
+git clone https://github.com/edvelhope/progetto-fine-corso-task-manager.git
+cd nome-repo
 ```
 
 ---
