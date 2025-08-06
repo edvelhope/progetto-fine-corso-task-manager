@@ -1,2 +1,3 @@
 # Ignora file sensibili nel backend
 backend/db.js
+backend/.env

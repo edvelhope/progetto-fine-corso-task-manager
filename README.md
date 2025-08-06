@@ -64,7 +64,14 @@ Crea un file db.js nella cartella backend, con le istruzioni in db.example.js.
 
 ---
 
-## 🔧 3. Avvio dell'App
+## 🔧 3. Configurazione file .env
+
+Rinomina il file .env.example in .env
+Apri il file .env e inserisci la tua chiave segreta per i token JWT.
+
+---
+
+## 🔧 4. Avvio dell'App
 
 cd backend
 npm install

@@ -1,3 +1,6 @@
+require("dotenv").config();
+console.log("JWT_SECRET:", process.env.JWT_SECRET); // DEBUG: verifica che venga letta
+
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
@@ -20,7 +23,7 @@ function authenticate(req, res, next) {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, "segretissimo"); // cambia con una chiave più sicura
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
@@ -118,9 +121,13 @@ app.post("/api/login", async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ error: "Password errata" });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, "segretissimo", {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     res.json({ token });
   } catch (error) {
