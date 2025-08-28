@@ -119,6 +119,8 @@ const statusClass = (option: TaskStatus) => {
 
 const updateTask = async () => {
     try {
+        const token = localStorage.getItem('token');
+
         const taskToSend = {
             id: editedTask.value.id,
             title: editedTask.value.title || '',
@@ -133,7 +135,8 @@ const updateTask = async () => {
         const response = await fetch(`${apiUrl}/api/task/${taskToSend.id}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(taskToSend)
         });
@@ -160,9 +163,14 @@ const changeStatus = (newStatus: TaskStatus) => {
 
 const deleteTask = async () => {
     try {
+        const token = localStorage.getItem('token');
 
         const response = await fetch(`${apiUrl}/api/task/${props.task.id}`, {
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
         });
 
         if (!response.ok) throw new Error("Errore nell'eliminazione della task");
