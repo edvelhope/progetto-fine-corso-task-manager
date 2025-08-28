@@ -42,13 +42,13 @@ import type { Task } from '@/model/task';
 import { onMounted, ref, computed } from 'vue';
 import TaskItem from './TaskItem.vue';
 
-let errorMsg = ref('');
-let tasks = ref<Task[]>([]);
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+const errorMsg = ref('');
+const tasks = ref<Task[]>([]);
 
 // Stato per ordinamento
 const sortBy = ref('default');
-
-const priorityOrder = { 'Alta': 1, 'Media': 2, 'Bassa': 3 };
 
 // Computed che restituisce la lista ordinata
 const sortedTasks = computed(() => {
@@ -102,7 +102,7 @@ const loadTasks = async () => {
             throw new Error('Utente non autenticato');
         }
 
-        const response = await fetch('http://localhost:8080/api/task', {
+        const response = await fetch(`${apiUrl}/api/task`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

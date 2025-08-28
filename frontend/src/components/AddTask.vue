@@ -39,14 +39,16 @@ import { TaskStatus, type Task } from '@/model/task';
 import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-let title = ref('');
-let description = ref('');
-let deadline = ref('');
-let priority = ref('Media'); // Default priority
 
-let tasks = ref<Task[]>([]);
-let errorMsg = ref('');
+const title = ref('');
+const description = ref('');
+const deadline = ref('');
+const priority = ref('Media'); // Default priority
+
+const tasks = ref<Task[]>([]);
+const errorMsg = ref('');
 
 const addTask = async () => {
 
@@ -57,7 +59,7 @@ const addTask = async () => {
 
     try {
 
-        const response = await fetch('http://localhost:8080/api/task', {
+        const response = await fetch(`${apiUrl}/api/task`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

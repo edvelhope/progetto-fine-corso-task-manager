@@ -62,6 +62,8 @@ import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed } from 'vue';
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const isExpired = computed(() => {
     if (!props.task.deadline) return false;
     const today = new Date();
@@ -128,7 +130,7 @@ const updateTask = async () => {
             priority: editedTask.value.priority || 'Media'
         };
 
-        const response = await fetch(`http://localhost:8080/api/task/${taskToSend.id}`, {
+        const response = await fetch(`${apiUrl}/api/task/${taskToSend.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -159,7 +161,7 @@ const changeStatus = (newStatus: TaskStatus) => {
 const deleteTask = async () => {
     try {
 
-        const response = await fetch(`http://localhost:8080/api/task/${props.task.id}`, {
+        const response = await fetch(`${apiUrl}/api/task/${props.task.id}`, {
             method: 'DELETE',
         });
 

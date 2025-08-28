@@ -19,6 +19,7 @@ import { useRouter } from 'vue-router'
 import auth from '@/stores/auth'  // <-- importa lo store auth
 import TaskLineLogo from '../../src/components/TasklineLogo.vue'
 
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const email = ref('')
 const password = ref('')
@@ -27,7 +28,7 @@ const router = useRouter()
 
 const handleLogin = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/login', {
+    const res = await fetch(`${apiUrl}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value, password: password.value })
