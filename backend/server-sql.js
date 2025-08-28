@@ -1,5 +1,6 @@
 require("dotenv").config();
 console.log("JWT_SECRET:", process.env.JWT_SECRET); // DEBUG: verifica che venga letta
+console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 const express = require("express");
 const cors = require("cors");
@@ -8,11 +9,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Permetti richieste dal frontend Vue
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Permetti richieste dal frontend Vue
+    credentials: true,
   })
 );
 app.use(express.json()); // Usa il parser JSON integrato di Express
@@ -34,10 +36,11 @@ function authenticate(req, res, next) {
 // GET lista tasks con autenticazione
 app.get("/api/task", authenticate, async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM tasks WHERE user_id = ?", [
-      req.user.id,
-    ]);
-    res.json(rows);
+    const result = await db.query(
+      "SELECT id, title, description, status, deadline, priority, created_at, updated_at FROM tasks WHERE user_id = $1",
+      [req.user.id]
+    );
+    res.json(result.rows);
   } catch (error) {
     console.error("Errore GET tasks", error);
     res.status(500).json({ error: "Errore nel recupero tasks" });
@@ -46,41 +49,45 @@ app.get("/api/task", authenticate, async (req, res) => {
 
 // POST aggiungi task collegata a user
 app.post("/api/task", authenticate, async (req, res) => {
-  const { title, description, deadline, priority } = req.body;
+  const { title, description, deadline, priority, status } = req.body;
   const userId = req.user.id;
 
+  // Imposta lo stato di default se non fornito
+  const taskStatus = status || "da fare";
+
   try {
-    const [result] = await db.query(
-      "INSERT INTO tasks (title, description, deadline, priority, user_id) VALUES (?, ?, ?, ?, ?)",
-      [title, description, deadline, priority, userId]
+    const result = await db.query(
+      "INSERT INTO tasks (title, description, deadline, priority, status, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, title, description, status, deadline, priority, created_at, updated_at",
+      [title, description, deadline, priority, taskStatus, userId]
     );
 
-    const newTask = {
-      id: result.insertId,
-      title,
-      description,
-      deadline,
-      priority,
-    };
-
-    res.json(newTask);
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("Errore POST task", error);
     res.status(500).json({ error: "Errore creazione task" });
   }
 });
 
-// PUT modifica task — MODIFICATO per gestire due_date
-app.put("/api/task/:id", async (req, res) => {
+// PUT modifica task
+app.put("/api/task/:id", authenticate, async (req, res) => {
   const { id } = req.params;
-  const { title, description, status, deadline, priority } = req.body; // aggiunto dueDate
+  const { title, description, status, deadline, priority } = req.body;
 
   try {
-    await db.query(
-      "UPDATE tasks SET title = ?, description = ?, status = ?, deadline = ?, priority = ? WHERE id = ?", // modificata query
-      [title, description, status, deadline, priority, id] // passato dueDate
+    // Aggiorna anche il campo updated_at
+    const result = await db.query(
+      `UPDATE tasks
+       SET title = $1, description = $2, status = $3, deadline = $4, priority = $5, updated_at = NOW()
+       WHERE id = $6 AND user_id = $7
+       RETURNING id, title, description, status, deadline, priority, created_at, updated_at`,
+      [title, description, status, deadline, priority, id, req.user.id]
     );
-    res.json({ message: "Task aggiornata" });
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Task non trovata" });
+    }
+
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("Errore UPDATE task", error);
     res.status(500).json({ error: "Errore aggiornamento task" });
@@ -88,13 +95,16 @@ app.put("/api/task/:id", async (req, res) => {
 });
 
 // DELETE elimina task
-app.delete("/api/task/:id", async (req, res) => {
+app.delete("/api/task/:id", authenticate, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [result] = await db.query("DELETE FROM tasks WHERE id = ?", [id]);
+    const result = await db.query(
+      "DELETE FROM tasks WHERE id = $1 AND user_id = $2",
+      [id, req.user.id]
+    );
 
-    if (result.affectedRows === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: "Task non trovata" });
     }
 
@@ -105,18 +115,19 @@ app.delete("/api/task/:id", async (req, res) => {
   }
 });
 
+// LOGIN
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [
+    const result = await db.query("SELECT * FROM users WHERE email = $1", [
       email,
     ]);
 
-    if (rows.length === 0)
+    if (result.rows.length === 0)
       return res.status(401).json({ error: "Utente non trovato" });
 
-    const user = rows[0];
+    const user = result.rows[0];
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ error: "Password errata" });
@@ -136,7 +147,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// POST per regisgtrazione nuovi utenti
+// REGISTRAZIONE
 app.post("/api/register", async (req, res) => {
   const { email, password } = req.body;
 
@@ -145,14 +156,19 @@ app.post("/api/register", async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.query("INSERT INTO users (email, password) VALUES (?, ?)", [
-      email,
-      hashedPassword,
-    ]);
-    res.status(201).json({ message: "Utente registrato con successo" });
+    const result = await db.query(
+      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id",
+      [email, hashedPassword]
+    );
+
+    res.status(201).json({
+      message: "Utente registrato con successo",
+      userId: result.rows[0].id,
+    });
   } catch (err) {
     console.error("Errore registrazione:", err);
-    if (err.code === "ER_DUP_ENTRY") {
+    if (err.code === "23505") {
+      // Codice errore per violazione unique constraint in PostgreSQL
       res.status(409).json({ error: "Email già registrata" });
     } else {
       res.status(500).json({ error: "Errore del server" });
