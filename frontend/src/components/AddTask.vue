@@ -5,7 +5,7 @@
             Aggiungi Nuova Task
         </h3>
 
-        <form @submit="addTask" class="task-form">
+        <form @submit.prevent="addTask" class="task-form">
             <div class="form-group">
                 <input v-model="title" placeholder="Titolo" required />
             </div>
