@@ -57,12 +57,14 @@
 
 
 <script setup lang="ts">
-import { TaskStatus, type Task } from '@/model/task';
-import { ref } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { computed } from 'vue';
+import { TaskStatus, type Task } from '@/model/task'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import auth from '@/stores/auth'
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+const router = useRouter()
 
 const isExpired = computed(() => {
     if (!props.task.deadline) return false;
@@ -141,16 +143,19 @@ const updateTask = async () => {
             body: JSON.stringify(taskToSend)
         });
 
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Errore aggiornamento: ${errText}`);
+        if (response.status === 401 || response.status === 403) {
+            auth.logout()
+            router.push('/login')
+            return
         }
 
-        // opzionale: puoi emettere evento al genitore se vuoi notificare il successo
-        // emit('taskUpdated', taskToSend);
+        if (!response.ok) {
+            const errText = await response.text()
+            throw new Error(`Errore aggiornamento: ${errText}`)
+        }
 
     } catch (error) {
-        console.error('Errore nel salvataggio automatico:', error);
+        console.error('Errore nel salvataggio automatico:', error)
     }
 };
 
@@ -162,8 +167,10 @@ const changeStatus = (newStatus: TaskStatus) => {
 };
 
 const deleteTask = async () => {
+    if (!confirm('Sei sicuro di voler eliminare questa task?')) return
+
     try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token')
 
         const response = await fetch(`${apiUrl}/api/task/${props.task.id}`, {
             method: 'DELETE',
@@ -171,15 +178,21 @@ const deleteTask = async () => {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
-        });
+        })
 
-        if (!response.ok) throw new Error("Errore nell'eliminazione della task");
+        if (response.status === 401 || response.status === 403) {
+            auth.logout()
+            router.push('/login')
+            return
+        }
 
-        emit('taskDeleted', props.task.id); // Notifica al padre per rimuoverla dalla lista
+        if (!response.ok) throw new Error("Errore nell'eliminazione della task")
+
+        emit('taskDeleted', props.task.id)
     } catch (error) {
-        console.error(error);
+        console.error(error)
     }
-};
+}
 
 </script>
 

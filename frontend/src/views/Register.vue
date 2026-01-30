@@ -5,10 +5,13 @@
         </div>
         <h2>Registrazione</h2>
         <form @submit.prevent="register">
-            <input v-model="email" type="email" placeholder="Email" required />
-            <input v-model="password" type="password" placeholder="Password" required />
-            <input v-model="confirmPassword" type="password" placeholder="Conferma Password" required />
-            <button type="submit">Registrati</button>
+            <label for="reg-email" class="sr-only">Email</label>
+            <input id="reg-email" v-model="email" type="email" placeholder="Email" required />
+            <label for="reg-password" class="sr-only">Password</label>
+            <input id="reg-password" v-model="password" type="password" placeholder="Password (min 8 caratteri)" required minlength="8" />
+            <label for="reg-confirm" class="sr-only">Conferma Password</label>
+            <input id="reg-confirm" v-model="confirmPassword" type="password" placeholder="Conferma Password" required />
+            <button type="submit" :disabled="loading">{{ loading ? 'Registrazione...' : 'Registrati' }}</button>
         </form>
         <p v-if="error" style="color:red">{{ error }}</p>
         <p v-if="success" style="color:green">{{ success }}</p>
@@ -16,46 +19,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import TaskLineLogo from '../../src/components/TasklineLogo.vue'
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const error = ref('');
-const success = ref('');
-const router = useRouter();
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const error = ref('')
+const success = ref('')
+const loading = ref(false)
+const router = useRouter()
 
 const register = async () => {
-    error.value = '';
-    success.value = '';
+    error.value = ''
+    success.value = ''
 
     if (password.value !== confirmPassword.value) {
-        error.value = 'Le password non coincidono';
-        return;
+        error.value = 'Le password non coincidono'
+        return
     }
+
+    if (password.value.length < 8) {
+        error.value = 'La password deve avere almeno 8 caratteri'
+        return
+    }
+
+    loading.value = true
 
     try {
         const res = await fetch(`${apiUrl}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email.value, password: password.value })
-        });
+        })
 
         if (!res.ok) {
-            const data = await res.json();
-            throw new Error(data.error || 'Errore registrazione');
+            const data = await res.json().catch(() => null)
+            throw new Error(data?.error || 'Errore registrazione')
         }
 
-        success.value = 'Registrazione completata! Ora puoi fare login.';
-        setTimeout(() => router.push('/login'), 1500);
+        success.value = 'Registrazione completata! Ora puoi fare login.'
+        setTimeout(() => router.push('/login'), 1500)
     } catch (err: any) {
-        error.value = err.message;
+        error.value = err.message
+    } finally {
+        loading.value = false
     }
-};
+}
 </script>
 
 <style scoped>
@@ -86,6 +99,18 @@ body {
     margin-bottom: 1rem;
 }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .register input {
     width: 100%;
     padding: 12px;
@@ -99,7 +124,7 @@ body {
     color: #bbb;
 }
 
-/* Pulsante Accedi stile fancy */
+/* Pulsante Registrati stile fancy */
 .register button {
     position: relative;
     width: 100%;
@@ -122,6 +147,11 @@ body {
     justify-content: center;
 }
 
+.register button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .register button::before {
     content: '';
     position: absolute;
@@ -134,16 +164,16 @@ body {
     pointer-events: none;
 }
 
-.register button:hover::before {
+.register button:hover:not(:disabled)::before {
     left: 100%;
 }
 
-.register button:hover {
+.register button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.register button:active {
+.register button:active:not(:disabled) {
     transform: scale(0.98);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }

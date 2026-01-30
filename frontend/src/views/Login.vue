@@ -5,9 +5,11 @@
     </div>
     <h2>Login</h2>
     <form @submit.prevent="handleLogin">
-      <input v-model="email" type="email" placeholder="Email" required />
-      <input v-model="password" type="password" placeholder="Password" required />
-      <button type="submit">Accedi</button>
+      <label for="login-email" class="sr-only">Email</label>
+      <input id="login-email" v-model="email" type="email" placeholder="Email" required />
+      <label for="login-password" class="sr-only">Password</label>
+      <input id="login-password" v-model="password" type="password" placeholder="Password" required />
+      <button type="submit" :disabled="loading">{{ loading ? 'Accesso...' : 'Accedi' }}</button>
     </form>
     <p v-if="error" style="color:red">{{ error }}</p>
   </div>
@@ -16,17 +18,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import auth from '@/stores/auth'  // <-- importa lo store auth
+import auth from '@/stores/auth'
 import TaskLineLogo from '../../src/components/TasklineLogo.vue'
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const loading = ref(false)
 const router = useRouter()
 
 const handleLogin = async () => {
+  loading.value = true
+  error.value = ''
+
   try {
     const res = await fetch(`${apiUrl}/api/login`, {
       method: 'POST',
@@ -34,15 +40,20 @@ const handleLogin = async () => {
       body: JSON.stringify({ email: email.value, password: password.value })
     })
 
-    if (!res.ok) throw new Error('Credenziali errate')
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      throw new Error(data?.error || 'Credenziali errate')
+    }
 
     const data = await res.json()
 
-    auth.login(data.token, email.value) // <-- aggiorna lo stato di login e dell'email e salva il token
+    auth.login(data.token, email.value)
 
     router.push('/')
   } catch (err: any) {
     error.value = err.message
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -74,6 +85,17 @@ body {
   margin-bottom: 1rem;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .login input {
   width: 100%;
@@ -111,6 +133,11 @@ body {
   justify-content: center;
 }
 
+.login button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .login button::before {
   content: '';
   position: absolute;
@@ -123,16 +150,16 @@ body {
   pointer-events: none;
 }
 
-.login button:hover::before {
+.login button:hover:not(:disabled)::before {
   left: 100%;
 }
 
-.login button:hover {
+.login button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.login button:active {
+.login button:active:not(:disabled) {
   transform: scale(0.98);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }

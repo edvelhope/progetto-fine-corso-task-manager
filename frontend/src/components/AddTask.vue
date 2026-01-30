@@ -7,18 +7,22 @@
 
         <form @submit.prevent="addTask" class="task-form">
             <div class="form-group">
-                <input v-model="title" placeholder="Titolo" required />
+                <label for="task-title" class="sr-only">Titolo</label>
+                <input id="task-title" v-model="title" placeholder="Titolo" required />
             </div>
 
             <div class="form-group">
-                <input v-model="description" placeholder="Descrizione" required />
+                <label for="task-desc" class="sr-only">Descrizione</label>
+                <input id="task-desc" v-model="description" placeholder="Descrizione" required />
             </div>
 
             <div class="form-group">
-                <input type="date" v-model="deadline" placeholder="Data di scadenza" />
+                <label for="task-deadline" class="sr-only">Data di scadenza</label>
+                <input id="task-deadline" type="date" v-model="deadline" placeholder="Data di scadenza" />
             </div>
             <div class="form-group">
-                <select v-model="priority" required>
+                <label for="task-priority" class="sr-only">Priorità</label>
+                <select id="task-priority" v-model="priority" required>
                     <option value="Alta">Alta</option>
                     <option value="Media">Media</option>
                     <option value="Bassa">Bassa</option>
@@ -26,44 +30,48 @@
             </div>
 
 
-            <button type="submit" class="fancy-button">
-                Aggiungi task
-                <FontAwesomeIcon :icon="['fas', 'circle-plus']" size="lg" />
+            <button type="submit" class="fancy-button" :disabled="loading">
+                {{ loading ? 'Aggiunta...' : 'Aggiungi task' }}
+                <FontAwesomeIcon v-if="!loading" :icon="['fas', 'circle-plus']" size="lg" />
             </button>
         </form>
+        <p v-if="errorMsg" style="color: red; margin-top: 0.5rem;">{{ errorMsg }}</p>
     </div>
 </template>
 
 <script setup lang="ts">
-import { TaskStatus, type Task } from '@/model/task';
-import { ref } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { TaskStatus } from '@/model/task'
+import { ref } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
+const emit = defineEmits<{
+    (e: 'taskAdded'): void
+}>()
 
-const title = ref('');
-const description = ref('');
-const deadline = ref('');
-const priority = ref('Media'); // Default priority
-
-const tasks = ref<Task[]>([]);
-const errorMsg = ref('');
+const title = ref('')
+const description = ref('')
+const deadline = ref('')
+const priority = ref('Media')
+const errorMsg = ref('')
+const loading = ref(false)
 
 const addTask = async () => {
-
     if (!title.value || !description.value) {
-        errorMsg.value = 'Tutti i campi sono obbligatori';
-        return;
+        errorMsg.value = 'Tutti i campi sono obbligatori'
+        return
     }
 
-    try {
+    loading.value = true
+    errorMsg.value = ''
 
+    try {
         const response = await fetch(`${apiUrl}/api/task`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('token')}` // 👈 Token usato per identificare l'utente
+                Authorization: `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({
                 title: title.value,
@@ -72,26 +80,24 @@ const addTask = async () => {
                 deadline: deadline.value || null,
                 priority: priority.value || 'Media'
             })
-        });
+        })
 
-        if (!response.ok) throw new Error(`Errore server: ${response.status}`);
-
-        const addedTask = await response.json();
-        tasks.value.push(addedTask);
+        if (!response.ok) throw new Error(`Errore server: ${response.status}`)
 
         // Reset del form
-        title.value = '';
-        description.value = '';
-        deadline.value = '';
-        errorMsg.value = '';
+        title.value = ''
+        description.value = ''
+        deadline.value = ''
+        errorMsg.value = ''
 
+        emit('taskAdded')
     } catch (err) {
-        console.error('Errore nell\'aggiunta della task:', err);
-        errorMsg.value = 'Errore durante l\'aggiunta della task';
+        console.error('Errore nell\'aggiunta della task:', err)
+        errorMsg.value = 'Errore durante l\'aggiunta della task'
+    } finally {
+        loading.value = false
     }
-};
-
-
+}
 </script>
 
 <style scoped>
@@ -122,22 +128,34 @@ const addTask = async () => {
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.form-group input {
-    padding: 0.6rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    width: 200px;
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
+.form-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.form-group input,
 .form-group select {
     padding: 0.6rem;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 6px;
-    width: 200px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -157,6 +175,13 @@ const addTask = async () => {
     color: white;
     box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.fancy-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .fancy-button::before {
@@ -171,48 +196,18 @@ const addTask = async () => {
     pointer-events: none;
 }
 
-.fancy-button:hover::before {
+.fancy-button:hover:not(:disabled)::before {
     left: 100%;
 }
 
-.fancy-button:hover {
+.fancy-button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.fancy-button:active {
+.fancy-button:active:not(:disabled) {
     transform: scale(0.98);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.sort-select {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #2c3e50;
-    padding: 6px 12px;
-    border: none;
-    border-bottom: 2px solid #3498db;
-    background: transparent;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    outline: none;
-}
-
-.sort-select:focus {
-    outline: none;
-    border-color: #1d4ed8;
-    /* un blu più scuro al focus */
-    background: #f0f9ff;
-}
-
-.sort-label {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #2c3e50;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-right: 8px;
 }
 
 @media only screen and (max-width: 992px) {
@@ -221,13 +216,17 @@ const addTask = async () => {
         flex-direction: column;
     }
 
+    .form-group {
+        width: 100%;
+    }
+
     .form-title {
         margin-left: auto;
         margin-right: auto;
     }
 
     .fancy-button {
-        width: 200px;
+        width: 100%;
     }
 }
 </style>

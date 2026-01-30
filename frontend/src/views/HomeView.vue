@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import AddTask from '@/components/AddTask.vue';
-import TaskList from '@/components/TaskList.vue';
+import { ref } from 'vue'
+import AddTask from '@/components/AddTask.vue'
+import TaskList from '@/components/TaskList.vue'
 
-defineEmits(['routeChanged'])
+const taskListRef = ref<InstanceType<typeof TaskList> | null>(null)
 
+const onTaskAdded = () => {
+  taskListRef.value?.loadTasks()
+}
 </script>
 
 <template>
-    <AddTask />
-    <TaskList />
+    <AddTask @taskAdded="onTaskAdded" />
+    <TaskList ref="taskListRef" />
 </template>
 
 <style scoped>
@@ -17,9 +21,5 @@ defineEmits(['routeChanged'])
   flex-direction: column;
   align-items: center;
   padding-top: 2rem;
-}
-
-.logo-wrapper {
-  margin-bottom: 1rem;
 }
 </style>
