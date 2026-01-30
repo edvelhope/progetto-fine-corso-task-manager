@@ -208,10 +208,6 @@ onMounted(loadTasks)
     background-color: #a3bbcf;
 }
 
-:global(.dark) .task-table tbody tr:hover {
-    background-color: rgba(99, 102, 241, 0.15);
-}
-
 .empty-state {
     display: flex;
     flex-direction: column;
